@@ -31,6 +31,13 @@ KNOWN_SKILLS = [
     "planos",
     "administrativo",
     "facturacion",
+    "negociacion",
+    "internacional",
+    "comercio exterior",
+    "exportaciones",
+    "importaciones",
+    "ingles",
+    "diplomacia",
 ]
 
 PROFILE_TAG_KEYWORDS = {
@@ -59,6 +66,17 @@ PROFILE_TAG_KEYWORDS = {
         "backend",
         "frontend",
         "desarrollador",
+    ],
+    "negociador": [
+        "negociador",
+        "negociadora",
+        "negociacion",
+        "negociación",
+        "internacional",
+        "comercio exterior",
+        "exportaciones",
+        "importaciones",
+        "comercio internacional",
     ],
 }
 

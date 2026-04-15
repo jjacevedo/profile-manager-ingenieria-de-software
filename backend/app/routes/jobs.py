@@ -95,6 +95,42 @@ SAMPLE_JOBS = [
         location="Medellin",
         required_skills_csv="administrativo,excel,contabilidad,inventario",
     ),
+    Job(
+        title="Negociador internacional",
+        company="Global Trade Partners",
+        description=(
+            "Negociación de contratos transfronterizos, "
+            "alianzas comerciales y cierre de acuerdos."
+        ),
+        location="Bogota",
+        required_skills_csv=(
+            "negociacion,internacional,comercio exterior,ingles,comunicacion"
+        ),
+    ),
+    Job(
+        title="Especialista en comercio exterior",
+        company="ExportHub Colombia",
+        description=(
+            "Coordinación de exportaciones, "
+            "relación con clientes internacionales y normativa."
+        ),
+        location="Medellin",
+        required_skills_csv=(
+            "negociacion,exportaciones,internacional,excel,comunicacion"
+        ),
+    ),
+    Job(
+        title="Asesor de negocios internacionales",
+        company="Bridge Markets",
+        description=(
+            "Prospectiva de mercados, "
+            "negociación multicultural y seguimiento de oportunidades."
+        ),
+        location="Remoto",
+        required_skills_csv=(
+            "negociacion,internacional,ventas,ingles,comunicacion"
+        ),
+    ),
 ]
 
 
