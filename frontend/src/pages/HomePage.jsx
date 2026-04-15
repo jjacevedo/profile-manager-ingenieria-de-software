@@ -6,6 +6,12 @@ import { Card, CardDescription, CardTitle } from "../components/ui/Card";
 import Alert from "../components/ui/Alert";
 import { LoadingState, SectionHeader } from "../components/ui/StateBlocks";
 
+function getScoreTone(score) {
+  if (score <= 50) return "bg-rose-100 text-rose-700 border-rose-200";
+  if (score <= 75) return "bg-amber-100 text-amber-700 border-amber-200";
+  return "bg-emerald-100 text-emerald-700 border-emerald-200";
+}
+
 export default function HomePage({ userId, refreshToken }) {
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState("");
@@ -86,7 +92,9 @@ export default function HomePage({ userId, refreshToken }) {
                         {item.job.company} - {item.job.location}
                       </p>
                     </div>
-                    <Badge variant="highlight">{item.score}%</Badge>
+                    <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getScoreTone(item.score)}`}>
+                      {item.score}%
+                    </span>
                   </div>
                   <p className="mt-2 text-sm text-slate-600">{item.reason}</p>
                 </article>

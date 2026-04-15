@@ -19,6 +19,7 @@ const defaultConfig = {
 
 export default function PostulacionesPage({ userId, onEvent }) {
   const [recommendations, setRecommendations] = useState([]);
+  const [appliedJobIds, setAppliedJobIds] = useState([]);
   const [config, setConfig] = useState(defaultConfig);
   const [loading, setLoading] = useState(true);
   const [assistedLoading, setAssistedLoading] = useState(false);
@@ -29,12 +30,14 @@ export default function PostulacionesPage({ userId, onEvent }) {
   async function loadData() {
     setLoading(true);
     try {
-      const [recs, automationConfig] = await Promise.all([
+      const [recs, automationConfig, applications] = await Promise.all([
         api.getRecommendations(userId),
-        api.getAutomationConfig(userId)
+        api.getAutomationConfig(userId),
+        api.getApplications(userId)
       ]);
       setRecommendations(recs);
       setConfig(automationConfig);
+      setAppliedJobIds(applications.map((app) => app.job_id));
       setError("");
     } catch (err) {
       setError(err.message);
@@ -51,6 +54,7 @@ export default function PostulacionesPage({ userId, onEvent }) {
     try {
       await api.manualApply({ user_id: userId, job_id: jobId });
       setMessage("Postulación manual registrada.");
+      setAppliedJobIds((prev) => (prev.includes(jobId) ? prev : [...prev, jobId]));
       setError("");
       onEvent();
     } catch (err) {
@@ -211,7 +215,12 @@ export default function PostulacionesPage({ userId, onEvent }) {
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {recommendations.map((recommendation) => (
-              <JobCard key={recommendation.job.id} recommendation={recommendation} onApply={handleManualApply} />
+              <JobCard
+                key={recommendation.job.id}
+                recommendation={recommendation}
+                onApply={handleManualApply}
+                isApplied={appliedJobIds.includes(recommendation.job.id)}
+              />
             ))}
           </div>
         )}

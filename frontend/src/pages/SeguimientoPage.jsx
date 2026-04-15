@@ -1,23 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { api } from "../api/client";
 import StatusBoard from "../components/StatusBoard";
 import Alert from "../components/ui/Alert";
+import Button from "../components/ui/Button";
 import { Card, CardDescription, CardTitle } from "../components/ui/Card";
 import { LoadingState, SectionHeader } from "../components/ui/StateBlocks";
+import {
+  initializeSimulation,
+  mergeApplicationsWithSimulation,
+  runSimulationTick
+} from "../utils/trackingSimulator";
 
 export default function SeguimientoPage({ userId, refreshToken, onEvent }) {
   const [applications, setApplications] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [simTick, setSimTick] = useState(0);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [apps, recs] = await Promise.all([api.getApplications(userId), api.getRecommendations(userId)]);
-      setApplications(apps);
+      const state = initializeSimulation(userId, apps);
+      setApplications(mergeApplicationsWithSimulation(apps, state));
       setRecommendations(recs);
       setError("");
     } catch (err) {
@@ -25,11 +33,25 @@ export default function SeguimientoPage({ userId, refreshToken, onEvent }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [userId]);
 
   useEffect(() => {
     loadData();
-  }, [userId, refreshToken]);
+  }, [userId, refreshToken, simTick, loadData]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const apps = await api.getApplications(userId);
+        runSimulationTick(userId, apps, "Automático");
+        setSimTick((prev) => prev + 1);
+      } catch {
+        // Evita romper la UI si hay una falla temporal de red.
+      }
+    }, 25000);
+
+    return () => clearInterval(interval);
+  }, [userId]);
 
   const jobsById = useMemo(() => {
     const index = {};
@@ -39,12 +61,13 @@ export default function SeguimientoPage({ userId, refreshToken, onEvent }) {
     return index;
   }, [recommendations]);
 
-  async function handleStatusChange(applicationId, status) {
+  async function handleSimulateCompanyUpdate() {
     try {
-      await api.updateApplicationStatus(applicationId, { status });
-      setMessage("Estado actualizado.");
+      const apps = await api.getApplications(userId);
+      runSimulationTick(userId, apps, "Evento empresa");
+      setMessage("Empresa simulada: se recibieron nuevas actualizaciones de estado.");
       setError("");
-      await loadData();
+      setSimTick((prev) => prev + 1);
       onEvent();
     } catch (err) {
       setError(err.message);
@@ -57,15 +80,20 @@ export default function SeguimientoPage({ userId, refreshToken, onEvent }) {
     <div className="space-y-6">
       <SectionHeader
         title="Seguimiento de postulaciones"
-        description="Monitorea avance, cambia estados y mantén el proceso actualizado."
+        description="Monitorea avance reportado por la empresa. Los estados se actualizan automáticamente (simulado)."
+        action={
+          <Button type="button" variant="secondary" onClick={handleSimulateCompanyUpdate}>
+            Simular actualización de empresa
+          </Button>
+        }
       />
       <Card>
         <CardTitle>Resumen rápido</CardTitle>
         <CardDescription className="mt-1">
-          Postulaciones totales: {applications.length}. Actualiza estados para reflejar tu progreso real.
+          Postulaciones totales: {applications.length}. El usuario no edita estados: el sistema refleja notificaciones externas simuladas.
         </CardDescription>
       </Card>
-      <StatusBoard applications={applications} jobsById={jobsById} onStatusChange={handleStatusChange} />
+      <StatusBoard applications={applications} jobsById={jobsById} />
       {message && <Alert tone="success">{message}</Alert>}
       {error && <Alert tone="error">{error}</Alert>}
     </div>

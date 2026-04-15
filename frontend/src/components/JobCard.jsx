@@ -2,7 +2,7 @@ import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import { Card, CardDescription, CardTitle } from "./ui/Card";
 
-export default function JobCard({ recommendation, onApply }) {
+export default function JobCard({ recommendation, onApply, isApplied = false }) {
   const { job, score, reason } = recommendation;
   const scoreTone = score >= 75 ? "text-emerald-700" : score >= 45 ? "text-amber-700" : "text-rose-700";
 
@@ -26,8 +26,14 @@ export default function JobCard({ recommendation, onApply }) {
           <p className="mt-1 text-xs text-slate-600">{reason}</p>
         </div>
 
-        <Button type="button" className="mt-auto" onClick={() => onApply(job.id)}>
-          Postular manualmente
+        <Button
+          type="button"
+          className="mt-auto"
+          onClick={() => onApply(job.id)}
+          disabled={isApplied}
+          variant={isApplied ? "secondary" : "primary"}
+        >
+          {isApplied ? "Postulado" : "Postular manualmente"}
         </Button>
       </article>
     </Card>
