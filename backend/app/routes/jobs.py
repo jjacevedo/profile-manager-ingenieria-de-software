@@ -99,15 +99,22 @@ SAMPLE_JOBS = [
 
 
 def ensure_jobs_seeded(session: Session) -> None:
-    count = len(session.exec(select(Job)).all())
-    if count > 0:
-        return
+    existing = session.exec(select(Job)).all()
+    existing_keys = {
+        (job.title.strip().lower(), job.company.strip().lower())
+        for job in existing
+    }
+
     for job in SAMPLE_JOBS:
-        session.add(job)
+        key = (job.title.strip().lower(), job.company.strip().lower())
+        if key not in existing_keys:
+            session.add(job)
     session.commit()
 
 
-def get_recommendations_for_user(session: Session, user_id: int, limit: int = 20) -> list[dict]:
+def get_recommendations_for_user(
+    session: Session, user_id: int, limit: int = 20
+) -> list[dict]:
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(
@@ -148,7 +155,10 @@ def list_jobs(
     return filtered
 
 
-@router.get("/recommendations/{user_id}", response_model=list[RecommendationRead])
+@router.get(
+    "/recommendations/{user_id}",
+    response_model=list[RecommendationRead],
+)
 def get_recommendations(
     user_id: int, session: Session = Depends(get_session)
 ) -> list[RecommendationRead]:
