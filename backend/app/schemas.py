@@ -8,6 +8,12 @@ from app.models import ApplicationStatus
 class UserCreate(BaseModel):
     full_name: str = Field(min_length=2, max_length=120)
     email: str = Field(min_length=5, max_length=120)
+    password: str = Field(min_length=6, max_length=100)
+
+
+class UserLogin(BaseModel):
+    email: str = Field(min_length=5, max_length=120)
+    password: str = Field(min_length=6, max_length=100)
 
 
 class UserRead(BaseModel):

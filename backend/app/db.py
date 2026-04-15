@@ -1,16 +1,35 @@
 from collections.abc import Generator
 
 from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import text
 
 from app.config import settings
 
 
-connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+connect_args = (
+    {"check_same_thread": False}
+    if settings.database_url.startswith("sqlite")
+    else {}
+)
 engine = create_engine(settings.database_url, echo=False, connect_args=connect_args)
 
 
 def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
+    ensure_user_password_column()
+
+
+def ensure_user_password_column() -> None:
+    with engine.begin() as conn:
+        rows = conn.execute(text("PRAGMA table_info(user)")).fetchall()
+        columns = {row[1] for row in rows}
+        if "password_hash" not in columns:
+            conn.execute(
+                text(
+                    "ALTER TABLE user "
+                    "ADD COLUMN password_hash TEXT DEFAULT ''"
+                )
+            )
 
 
 def get_session() -> Generator[Session, None, None]:

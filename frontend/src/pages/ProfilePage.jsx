@@ -68,6 +68,25 @@ export default function ProfilePage({ userId, onEvent, onGoToPostulaciones }) {
     }
   }
 
+  async function handleExtractFile(file) {
+    try {
+      const data = await api.extractProfileFile(userId, file);
+      setProfile(data);
+      setForm({
+        summary: data.summary,
+        skills: skillsToString(data.skills),
+        experience_years: data.experience_years,
+        education: data.education
+      });
+      setMessage("Perfil extraído desde archivo y actualizado correctamente.");
+      setError("");
+      onEvent();
+    } catch (err) {
+      setError(err.message);
+      setMessage("");
+    }
+  }
+
   async function handleSave(event) {
     event.preventDefault();
     setSaving(true);
@@ -118,7 +137,7 @@ export default function ProfilePage({ userId, onEvent, onGoToPostulaciones }) {
         description="Actualiza tu información para mejorar la calidad del match de vacantes."
       />
 
-      <CVForm onExtract={handleExtract} />
+      <CVForm onExtract={handleExtract} onExtractFile={handleExtractFile} />
 
       <Card>
         <form className="space-y-4" onSubmit={handleSave}>

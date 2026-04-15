@@ -1,8 +1,11 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 async function request(path, options = {}) {
+  const isFormData = options.body instanceof FormData;
   const response = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    headers: isFormData
+      ? { ...(options.headers || {}) }
+      : { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options
   });
 
@@ -17,8 +20,18 @@ export const api = {
   createUser: (payload) =>
     request("/api/users", { method: "POST", body: JSON.stringify(payload) }),
 
+  loginUser: (payload) =>
+    request("/api/users/login", { method: "POST", body: JSON.stringify(payload) }),
+
   extractProfile: (payload) =>
     request("/api/profile/extract", { method: "POST", body: JSON.stringify(payload) }),
+
+  extractProfileFile: (userId, file) => {
+    const formData = new FormData();
+    formData.append("user_id", String(userId));
+    formData.append("file", file);
+    return request("/api/profile/extract-file", { method: "POST", body: formData });
+  },
 
   getProfile: (userId) => request(`/api/profile/${userId}`),
 

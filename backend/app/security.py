@@ -1,4 +1,6 @@
 import re
+import secrets
+import hashlib
 from html import escape
 from typing import Optional
 
@@ -22,9 +24,29 @@ def sanitize_email(value: str) -> str:
     return cleaned
 
 
-def auth_placeholder(x_user_id: Optional[str] = Header(default=None)) -> Optional[int]:
+def auth_placeholder(
+    x_user_id: Optional[str] = Header(default=None),
+) -> Optional[int]:
     if x_user_id is None:
         return None
     if not x_user_id.isdigit():
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Header X-User-Id inválido.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Header X-User-Id inválido.",
+        )
     return int(x_user_id)
+
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_hex(16)
+    digest = hashlib.sha256(f"{salt}:{password}".encode("utf-8")).hexdigest()
+    return f"{salt}${digest}"
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    try:
+        salt, digest = password_hash.split("$", 1)
+    except ValueError:
+        return False
+    check = hashlib.sha256(f"{salt}:{password}".encode("utf-8")).hexdigest()
+    return secrets.compare_digest(check, digest)

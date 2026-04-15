@@ -25,6 +25,12 @@ KNOWN_SKILLS = [
     "atencion al cliente",
     "excel",
     "contabilidad",
+    "inventario",
+    "higiene",
+    "comunicacion",
+    "planos",
+    "administrativo",
+    "facturacion",
 ]
 
 PROFILE_TAG_KEYWORDS = {
@@ -85,7 +91,11 @@ def build_match_reason(overlap: list[str], missing: list[str]) -> str:
 def infer_profile_tags(profile: Optional[Profile]) -> list[str]:
     if not profile:
         return []
-    text = f"{profile.summary} {profile.skills_csv} {profile.education}".lower()
+    text = (
+        f"{profile.summary} "
+        f"{profile.skills_csv} "
+        f"{profile.education}"
+    ).lower()
     tags = []
     for tag, keywords in PROFILE_TAG_KEYWORDS.items():
         if any(keyword in text for keyword in keywords):
@@ -102,7 +112,11 @@ def compute_match(profile: Optional[Profile], job: Job) -> Tuple[int, str]:
             "recomendaciones.",
         )
 
-    job_text = f"{job.title} {job.description} {job.required_skills_csv}".lower()
+    job_text = (
+        f"{job.title} "
+        f"{job.description} "
+        f"{job.required_skills_csv}"
+    ).lower()
     profile_skills = parse_skills_csv(profile.skills_csv)
     profile_tags = infer_profile_tags(profile)
     overlap = [skill for skill in job_skills if skill in profile_skills]
