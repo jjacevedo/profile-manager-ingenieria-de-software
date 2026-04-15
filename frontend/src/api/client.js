@@ -1,0 +1,56 @@
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+async function request(path, options = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || "Error inesperado");
+  }
+  return data;
+}
+
+export const api = {
+  createUser: (payload) =>
+    request("/api/users", { method: "POST", body: JSON.stringify(payload) }),
+
+  extractProfile: (payload) =>
+    request("/api/profile/extract", { method: "POST", body: JSON.stringify(payload) }),
+
+  getProfile: (userId) => request(`/api/profile/${userId}`),
+
+  updateProfile: (userId, payload) =>
+    request(`/api/profile/${userId}`, { method: "PUT", body: JSON.stringify(payload) }),
+
+  getRecommendations: (userId) => request(`/api/jobs/recommendations/${userId}`),
+
+  getHome: (userId) => request(`/api/home/${userId}`),
+
+  manualApply: (payload) =>
+    request("/api/applications/manual", { method: "POST", body: JSON.stringify(payload) }),
+
+  assistedApply: (payload) =>
+    request("/api/applications/assisted", { method: "POST", body: JSON.stringify(payload) }),
+
+  getApplications: (userId) => request(`/api/applications/${userId}`),
+
+  updateApplicationStatus: (applicationId, payload) =>
+    request(`/api/applications/${applicationId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify(payload)
+    }),
+
+  getAutomationConfig: (userId) => request(`/api/applications/automation/${userId}`),
+
+  updateAutomationConfig: (userId, payload) =>
+    request(`/api/applications/automation/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    }),
+
+  runAutomation: (userId) =>
+    request(`/api/applications/automation/${userId}/run`, { method: "POST" })
+};
