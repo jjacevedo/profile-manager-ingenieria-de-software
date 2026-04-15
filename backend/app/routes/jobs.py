@@ -38,6 +38,63 @@ SAMPLE_JOBS = [
         location="Medellin",
         required_skills_csv="python,sql,git",
     ),
+    Job(
+        title="Chef de cocina",
+        company="Sabores Urbanos",
+        description=(
+            "Planeación de menú, preparación de platos "
+            "y control de cocina."
+        ),
+        location="Medellin",
+        required_skills_csv="chef,cocina,gastronomia,inventario",
+    ),
+    Job(
+        title="Auxiliar de cocina",
+        company="Cocina Viva",
+        description=(
+            "Apoyo en mise en place, alistamiento "
+            "y buenas prácticas de manipulación."
+        ),
+        location="Bogota",
+        required_skills_csv="cocina,gastronomia,higiene,atencion al cliente",
+    ),
+    Job(
+        title="Arquitecto de diseño",
+        company="Espacio y Forma",
+        description="Diseño arquitectónico, modelado y coordinación con obra.",
+        location="Medellin",
+        required_skills_csv="arquitectura,autocad,revit,obra,planos",
+    ),
+    Job(
+        title="Asistente de obra",
+        company="Constructora Horizonte",
+        description=(
+            "Seguimiento de obra, reportes diarios "
+            "y apoyo a coordinación técnica."
+        ),
+        location="Cali",
+        required_skills_csv="obra,planos,autocad,excel",
+    ),
+    Job(
+        title="Asesor comercial",
+        company="Ventas Plus",
+        description=(
+            "Atención al cliente y cierre de ventas "
+            "en punto físico y digital."
+        ),
+        location="Remoto",
+        required_skills_csv="ventas,atencion al cliente,excel,comunicacion",
+    ),
+    Job(
+        title="Auxiliar administrativo",
+        company="Gestión Central",
+        description=(
+            "Soporte administrativo, facturación, "
+            "archivo y manejo de inventarios."
+        ),
+        location="Medellin",
+        required_skills_csv="administrativo,excel,contabilidad,inventario",
+    ),
 ]
 
 
@@ -53,7 +110,10 @@ def ensure_jobs_seeded(session: Session) -> None:
 def get_recommendations_for_user(session: Session, user_id: int, limit: int = 20) -> list[dict]:
     user = session.get(User, user_id)
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado.",
+        )
 
     profile = session.get(Profile, user_id)
     jobs = session.exec(select(Job)).all()
@@ -78,7 +138,9 @@ def list_jobs(
     location_lower = location.lower().strip()
     filtered = []
     for job in jobs:
-        if search_lower and search_lower not in f"{job.title} {job.company} {job.description}".lower():
+        if search_lower and search_lower not in (
+            f"{job.title} {job.company} {job.description}"
+        ).lower():
             continue
         if location_lower and location_lower not in job.location.lower():
             continue
@@ -87,7 +149,9 @@ def list_jobs(
 
 
 @router.get("/recommendations/{user_id}", response_model=list[RecommendationRead])
-def get_recommendations(user_id: int, session: Session = Depends(get_session)) -> list[RecommendationRead]:
+def get_recommendations(
+    user_id: int, session: Session = Depends(get_session)
+) -> list[RecommendationRead]:
     ensure_jobs_seeded(session)
     ranked = get_recommendations_for_user(session, user_id, limit=20)
     output: list[RecommendationRead] = []
@@ -106,5 +170,8 @@ def get_recommendations(user_id: int, session: Session = Depends(get_session)) -
 def get_job(job_id: int, session: Session = Depends(get_session)) -> Job:
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vacante no encontrada.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vacante no encontrada.",
+        )
     return job
