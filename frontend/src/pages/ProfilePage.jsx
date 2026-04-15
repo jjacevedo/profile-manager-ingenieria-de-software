@@ -12,7 +12,7 @@ function skillsToString(skills) {
   return Array.isArray(skills) ? skills.join(", ") : "";
 }
 
-export default function ProfilePage({ userId, onEvent }) {
+export default function ProfilePage({ userId, onEvent, onGoToPostulaciones }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -94,6 +94,21 @@ export default function ProfilePage({ userId, onEvent }) {
     }
   }
 
+  async function handleSearchOffersByProfile() {
+    try {
+      await api.getRecommendations(userId);
+      setMessage("Ofertas encontradas según tu perfil. Te llevamos a postulaciones.");
+      setError("");
+      onEvent();
+      if (onGoToPostulaciones) {
+        onGoToPostulaciones("Ofertas actualizadas según tu perfil.");
+      }
+    } catch (err) {
+      setError(err.message);
+      setMessage("");
+    }
+  }
+
   if (loading) return <LoadingState title="Cargando perfil..." />;
 
   return (
@@ -157,6 +172,9 @@ export default function ProfilePage({ userId, onEvent }) {
 
           <Button type="submit" isLoading={saving}>
             Guardar perfil
+          </Button>
+          <Button type="button" variant="secondary" onClick={handleSearchOffersByProfile}>
+            Buscar ofertas según tu perfil
           </Button>
         </form>
       </Card>

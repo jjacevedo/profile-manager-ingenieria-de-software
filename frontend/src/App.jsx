@@ -30,6 +30,7 @@ export default function App() {
   const [tab, setTab] = useState("home");
   const [user, setUser] = useState(readStoredUser);
   const [refreshToken, setRefreshToken] = useState(0);
+  const [postulacionesNotice, setPostulacionesNotice] = useState("");
   const [registerForm, setRegisterForm] = useState({ full_name: "", email: "" });
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
@@ -59,6 +60,11 @@ export default function App() {
 
   function notifyDataChange() {
     setRefreshToken((prev) => prev + 1);
+  }
+
+  function goToPostulacionesWithNotice(notice) {
+    setPostulacionesNotice(notice || "");
+    setTab("postulaciones");
   }
 
   if (!user) {
@@ -105,8 +111,17 @@ export default function App() {
   return (
     <Layout currentTab={tab} onTabChange={setTab} user={user} onReset={handleResetUser}>
       {tab === "home" && <HomePage userId={userId} refreshToken={refreshToken} />}
-      {tab === "perfil" && <ProfilePage userId={userId} onEvent={notifyDataChange} />}
-      {tab === "postulaciones" && <PostulacionesPage userId={userId} onEvent={notifyDataChange} />}
+      {tab === "perfil" && (
+        <ProfilePage userId={userId} onEvent={notifyDataChange} onGoToPostulaciones={goToPostulacionesWithNotice} />
+      )}
+      {tab === "postulaciones" && (
+        <PostulacionesPage
+          userId={userId}
+          onEvent={notifyDataChange}
+          initialNotice={postulacionesNotice}
+          onNoticeConsumed={() => setPostulacionesNotice("")}
+        />
+      )}
       {tab === "seguimiento" && (
         <SeguimientoPage userId={userId} refreshToken={refreshToken} onEvent={notifyDataChange} />
       )}

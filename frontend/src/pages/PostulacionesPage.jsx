@@ -17,7 +17,7 @@ const defaultConfig = {
   location_filter: ""
 };
 
-export default function PostulacionesPage({ userId, onEvent }) {
+export default function PostulacionesPage({ userId, onEvent, initialNotice = "", onNoticeConsumed }) {
   const [recommendations, setRecommendations] = useState([]);
   const [appliedJobIds, setAppliedJobIds] = useState([]);
   const [config, setConfig] = useState(defaultConfig);
@@ -49,6 +49,12 @@ export default function PostulacionesPage({ userId, onEvent }) {
   useEffect(() => {
     loadData();
   }, [userId]);
+
+  useEffect(() => {
+    if (!initialNotice) return;
+    setMessage(initialNotice);
+    if (onNoticeConsumed) onNoticeConsumed();
+  }, [initialNotice, onNoticeConsumed]);
 
   async function handleManualApply(jobId) {
     try {
