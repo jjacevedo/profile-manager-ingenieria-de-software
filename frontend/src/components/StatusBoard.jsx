@@ -6,6 +6,7 @@ function statusTone(status) {
   if (status === "Postulado") return "bg-slate-100 text-slate-700 border-slate-200";
   if (status === "En revisión") return "bg-amber-100 text-amber-700 border-amber-200";
   if (status === "Entrevista") return "bg-sky-100 text-sky-700 border-sky-200";
+  if (status === "Aceptado") return "bg-emerald-100 text-emerald-700 border-emerald-200";
   if (status === "Rechazado") return "bg-rose-100 text-rose-700 border-rose-200";
   return "bg-slate-100 text-slate-700 border-slate-200";
 }
@@ -52,7 +53,7 @@ export default function StatusBoard({ applications, jobsById }) {
               <div>
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Timeline compacta</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {["Postulado", "En revisión", "Entrevista", "Rechazado"].map((step) => (
+                  {["Postulado", "En revisión", "Entrevista", "Aceptado", "Rechazado"].map((step) => (
                     <Badge key={step} variant={step === current ? "highlight" : "default"}>
                       {step}
                     </Badge>

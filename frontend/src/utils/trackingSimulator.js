@@ -1,14 +1,31 @@
 const STORAGE_PREFIX = "pm-tracking-sim";
-const FLOW = ["Postulado", "En revisión", "Entrevista", "Rechazado"];
+const TERMINAL_STATUSES = new Set(["Rechazado", "Aceptado"]);
+
+function randomTransition(status) {
+  const roll = Math.random();
+
+  if (status === "Postulado") {
+    if (roll < 0.7) return "En revisión";
+    return "Postulado";
+  }
+
+  if (status === "En revisión") {
+    if (roll < 0.5) return "Entrevista";
+    if (roll < 0.95) return "En revisión";
+    return "Rechazado";
+  }
+
+  if (status === "Entrevista") {
+    if (roll < 0.35) return "Aceptado";
+    if (roll < 0.6) return "Rechazado";
+    return "Entrevista";
+  }
+
+  return status;
+}
 
 function nowIso() {
   return new Date().toISOString();
-}
-
-function nextStatus(status) {
-  const idx = FLOW.indexOf(status);
-  if (idx < 0 || idx >= FLOW.length - 1) return status;
-  return FLOW[idx + 1];
 }
 
 function storageKey(userId) {
@@ -47,7 +64,8 @@ function ensureEntry(state, app) {
 }
 
 function advanceOne(entry, source) {
-  const next = nextStatus(entry.currentStatus);
+  if (TERMINAL_STATUSES.has(entry.currentStatus)) return false;
+  const next = randomTransition(entry.currentStatus);
   if (next === entry.currentStatus) return false;
   const ts = nowIso();
   entry.history.unshift({
@@ -87,10 +105,13 @@ export function runSimulationTick(userId, applications, source = "Automático") 
   const ordered = applications.map((app) => ensureEntry(state, app));
   if (ordered.length === 0) return state;
 
+  // Mezcla el orden para no sesgar siempre las primeras postulaciones.
+  const shuffled = [...ordered].sort(() => Math.random() - 0.5);
+
   // Avanza como máximo la mitad de candidaturas por ciclo para hacerlo más realista.
   const maxSteps = Math.max(1, Math.floor(ordered.length / 2));
   let moved = 0;
-  for (const entry of ordered) {
+  for (const entry of shuffled) {
     if (moved >= maxSteps) break;
     if (advanceOne(entry, source)) moved += 1;
   }

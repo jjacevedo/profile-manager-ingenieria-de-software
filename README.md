@@ -1,6 +1,31 @@
-# Profile Manager - Entrega corregida
+# Profile Manager - Entrega final
 
-Proyecto full stack listo para entrega académica, con separación clara frontend/backend y cobertura de los requisitos funcionales de la plantilla.
+Aplicación full stack para gestionar perfil laboral, recomendaciones de vacantes
+y seguimiento de postulaciones con simulación de estados.
+
+## Características principales
+
+- Autenticación de usuario con registro e inicio de sesión (hash de contraseña).
+- Carga de CV por texto y por archivo (`PDF`, `DOCX`, `TXT`).
+- Extracción mejorada de CV: habilidades, años de experiencia, educación y
+  datos personales detectables.
+- Perfil profesional editable y persistente.
+- Recomendaciones con score de compatibilidad y explicación.
+- Semáforo visual de score en home:
+  - `<= 50`: rojo
+  - `51 - 75`: amarillo
+  - `76 - 100`: verde
+- Postulación manual y asistida.
+- Seguimiento automático simulado con timeline e historial:
+  - estados: `Postulado`, `En revisión`, `Entrevista`, `Aceptado`,
+    `Rechazado`
+  - actualizaciones por temporizador + botón de simulación de empresa.
+
+## Stack técnico
+
+- Backend: FastAPI, SQLModel, SQLite, Pydantic.
+- Frontend: React + Vite + Tailwind CSS.
+- Parsing de archivos CV: `pypdf`, `python-docx`, `python-multipart`.
 
 ## Estructura del proyecto
 
@@ -10,6 +35,8 @@ Codex/
 │   ├── app/
 │   │   ├── routes/
 │   │   ├── services/
+│   │   │   ├── cv_parser.py
+│   │   │   └── matching.py
 │   │   ├── config.py
 │   │   ├── db.py
 │   │   ├── models.py
@@ -22,82 +49,75 @@ Codex/
 │   │   ├── api/
 │   │   ├── components/
 │   │   ├── pages/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── styles.css
-│   ├── index.html
+│   │   ├── utils/
+│   │   │   └── trackingSimulator.js
+│   │   └── App.jsx
 │   ├── package.json
 │   └── vite.config.js
 └── docs/
-    ├── backlog-producto.md
-    ├── sprint-backlog.md
-    └── pruebas-aceptacion.md
 ```
 
-## Requisitos técnicos
+## Requisitos
 
-- Python 3.11+
-- Node.js 18+ y npm
+- Python 3.9+ (compatible con 3.9 y superior).
+- Node.js 18+ y npm.
 
-## Ejecución backend
+## Configuración y ejecución
 
-1. Ir a la carpeta backend:
-   ```bash
-   cd backend
-   ```
-2. Crear entorno virtual:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-3. Instalar dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Ejecutar API:
-   ```bash
-   uvicorn main:app --reload
-   ```
-5. Verificar salud:
-   - `http://localhost:8000/health`
-   - Swagger: `http://localhost:8000/docs`
+### 1) Backend
 
-## Ejecución frontend
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```
 
-1. Abrir otra terminal e ir a frontend:
-   ```bash
-   cd frontend
-   ```
-2. Instalar dependencias:
-   ```bash
-   npm install
-   ```
-3. Ejecutar aplicación:
-   ```bash
-   npm run dev
-   ```
-4. Abrir:
-   - `http://localhost:5173`
+Verificación:
 
-## Flujo funcional esperado
+- `http://127.0.0.1:8000/health`
+- `http://127.0.0.1:8000/docs`
 
-1. Crear cuenta (registro).
-2. Cargar CV en texto y extraer habilidades.
-3. Editar perfil profesional.
-4. Revisar recomendaciones por score.
-5. Ejecutar postulación manual/asistida/automática.
-6. Gestionar estados en seguimiento.
-7. Revisar métricas en Home.
+### 2) Frontend
 
-## Checklist de cumplimiento
+En otra terminal:
 
-- [x] Registro de usuario.
-- [x] Carga de CV y extracción inicial de habilidades.
-- [x] Perfil editable y persistido.
-- [x] Recomendaciones de vacantes con score y explicación.
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abrir:
+
+- `http://localhost:5173`
+
+## Flujo sugerido de uso
+
+1. Registrarse o iniciar sesión.
+2. Cargar CV (texto o archivo) y revisar extracción automática.
+3. Ajustar perfil profesional.
+4. Buscar ofertas y postular.
+5. Monitorear avance en seguimiento simulado.
+
+## Solución de problemas rápida
+
+- Si login/registro queda cargando:
+  - confirmar backend activo en `127.0.0.1:8000`
+  - revisar que `pip install -r requirements.txt` esté completo
+- Si falla carga de CV `DOCX/PDF`:
+  - instalar dependencias en backend (`python-docx`, `pypdf`)
+- Si seguimiento muestra resultados antiguos:
+  - limpiar `localStorage` de claves `pm-tracking-sim:*`
+
+## Estado de cumplimiento
+
+- [x] Registro e inicio de sesión con contraseña.
+- [x] Carga de CV por texto y archivo.
+- [x] Extracción automática de datos del CV.
+- [x] Perfil editable con persistencia.
+- [x] Recomendaciones por afinidad de perfil.
 - [x] Postulación manual y asistida.
-- [x] Configuración y ejecución de postulación automática.
-- [x] Seguimiento por estados.
-- [x] Home con métricas y resumen.
-- [x] Backlog de producto y sprint backlog.
-- [x] Pruebas de aceptación documentadas.
+- [x] Seguimiento automático simulado con historial.
+- [x] Interfaz limpia y consistente para entrega.

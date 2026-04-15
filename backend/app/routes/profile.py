@@ -10,8 +10,6 @@ from fastapi import (
     UploadFile,
     status,
 )
-from docx import Document
-from pypdf import PdfReader
 from sqlmodel import Session
 
 from app.db import get_session
@@ -39,9 +37,28 @@ def extract_text_from_upload(file: UploadFile, content: bytes) -> str:
     if filename.endswith(".txt"):
         return content.decode("utf-8", errors="ignore")
     if filename.endswith(".pdf"):
+        try:
+            from pypdf import PdfReader
+        except ModuleNotFoundError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    "Falta dependencia para PDF: instala 'pypdf' en backend."
+                ),
+            ) from exc
         reader = PdfReader(io.BytesIO(content))
         return " ".join((page.extract_text() or "") for page in reader.pages)
     if filename.endswith(".docx"):
+        try:
+            from docx import Document
+        except ModuleNotFoundError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    "Falta dependencia para DOCX: instala 'python-docx' "
+                    "en backend."
+                ),
+            ) from exc
         doc = Document(io.BytesIO(content))
         return " ".join(paragraph.text for paragraph in doc.paragraphs)
     raise HTTPException(
@@ -120,7 +137,10 @@ async def extract_profile_file(
 
 
 @router.get("/{user_id}", response_model=ProfileRead)
-def get_profile(user_id: int, session: Session = Depends(get_session)) -> ProfileRead:
+def get_profile(
+    user_id: int,
+    session: Session = Depends(get_session),
+) -> ProfileRead:
     profile = session.get(Profile, user_id)
     if not profile:
         raise HTTPException(

@@ -1,13 +1,27 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const REQUEST_TIMEOUT_MS = 12000;
 
 async function request(path, options = {}) {
   const isFormData = options.body instanceof FormData;
-  const response = await fetch(`${API_URL}${path}`, {
-    headers: isFormData
-      ? { ...(options.headers || {}) }
-      : { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      headers: isFormData
+        ? { ...(options.headers || {}) }
+        : { "Content-Type": "application/json", ...(options.headers || {}) },
+      signal: controller.signal,
+      ...options
+    });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("La solicitud tardó demasiado. Verifica el backend.");
+    }
+    throw new Error("No fue posible conectar con el backend.");
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
