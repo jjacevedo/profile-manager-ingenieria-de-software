@@ -121,3 +121,12 @@ Abrir:
 - [x] Postulación manual y asistida.
 - [x] Seguimiento automático simulado con historial.
 - [x] Interfaz limpia y consistente para entrega.
+
+## Documentación académica de apoyo
+
+- `docs/backlog-producto.md`
+- `docs/sprint-backlog.md`
+- `docs/pruebas-aceptacion.md`
+- `docs/entrega3-borrador.md`
+- `docs/guion-presentacion-proyecto.md`
+- `docs/matriz-cumplimiento-entregas.md`
