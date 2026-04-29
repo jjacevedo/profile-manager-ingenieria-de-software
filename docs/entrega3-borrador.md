@@ -5,9 +5,9 @@
 **Proyecto:** Profile Manager - Plataforma de gestion de perfil y postulaciones  
 **Curso:** Ingenieria de Software  
 **Entrega:** 3 (Producto funcional)  
-**Integrantes:** [Completar nombres del equipo]  
-**Docente/PO:** [Completar]  
-**Fecha:** [Completar]
+**Integrantes:** Juan Jose Acevedo, Daniel Marquez, Leandro Cardona, Andres Mazo  
+**Docente/PO:** Elizabeth Suescun Monsalve  
+**Fecha:** 2026
 
 ---
 
@@ -46,6 +46,12 @@ Se realizo retrospectiva con enfoque **Start - Stop - Continue**:
 - **Stop:** depender de datos mock sin persistencia para validar flujos reales.
 - **Continue:** integracion incremental y validacion continua con pruebas manuales de punta a punta.
 
+Ceremonias registradas durante el sprint:
+
+- Dailies/weekly de seguimiento tecnico con estado de tareas y bloqueos.
+- Sprint review con demostracion de flujo completo ante PO y lider tecnico.
+- Retrospectiva formal con acuerdos accionables para el sprint siguiente.
+
 ### Hallazgos del sprint previo
 
 - Habia friccion en login/registro por usuarios legacy sin hash de contrasena.
@@ -70,27 +76,25 @@ Se realizo retrospectiva con enfoque **Start - Stop - Continue**:
 
 ## Seccion 3: Planificacion Sprint actual
 
-### Historias de usuario priorizadas
+### Historias de usuario priorizadas (Sprint 2)
 
-1. **HU-01:** Como candidato quiero registrarme e iniciar sesion para usar el sistema de manera personalizada.  
-2. **HU-02:** Como candidato quiero cargar mi CV en texto/PDF/DOCX/TXT para extraer automaticamente mi perfil.  
-3. **HU-03:** Como candidato quiero ver recomendaciones con score y explicacion para priorizar vacantes.  
-4. **HU-04:** Como candidato quiero postular manual, asistido o automatico para optimizar tiempo.  
-5. **HU-05:** Como candidato quiero ver seguimiento de estados para entender el avance de cada postulacion.
+1. **US 1.3:** Como candidato, quiero un agente por chat que me pregunte datos faltantes para completar mi perfil.  
+2. **US 2.3:** Como candidato, quiero notificaciones simuladas de "matches de hoy".  
+3. **US 3.3:** Como candidato, quiero configurar reglas de autopostulacion (min/max, frecuencia, filtros).  
+4. **US 4.3:** Como candidato, quiero una vista calendario de entrevistas programadas.
 
 ### Estimacion (Poker Planning)
 
-Se uso estimacion relativa por complejidad:
+Se uso estimacion relativa por complejidad (Planning Poker):
 
-- HU-01: 5 pts  
-- HU-02: 8 pts  
-- HU-03: 8 pts  
-- HU-04: 8 pts  
-- HU-05: 5 pts
+- US 1.3: 8 pts  
+- US 2.3: 5 pts  
+- US 3.3: 8 pts  
+- US 4.3: 5 pts
 
-Total estimado: **34 puntos**.
+Total estimado Sprint 2: **26 puntos**.
 
-### Cambios en backlog
+### Cambios en backlog y tablero
 
 - Se agregaron tareas tecnicas de:
   - migracion de autenticacion legacy,
@@ -98,6 +102,12 @@ Total estimado: **34 puntos**.
   - mejoras de parser CV,
   - ajuste de simulacion de estados,
   - ampliacion de seed de vacantes por dominios.
+
+El tablero de sprint debe reflejar:
+
+- columnas de estado por sprint y `Done`,
+- responsables por historia,
+- estimacion de puntos y criterios de aceptacion.
 
 > Evidencias sugeridas:
 > - Link sprint backlog (GitHub Projects / Azure Boards).
@@ -325,6 +335,10 @@ El score de recomendacion se obtiene comparando habilidades del perfil con habil
 5. Se limita a 100 y se genera una explicacion textual.
 
 Esto permite una recomendacion **explicable**, no caja negra.
+
+> Nota para sustentacion: `Aceptado` hoy se usa en la simulacion del frontend
+> (seguimiento visual), mientras que los estados persistidos en backend incluyen
+> `Postulado`, `En revisión`, `Entrevista` y `Rechazado`.
 
 ---
 
